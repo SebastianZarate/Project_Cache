@@ -1,12 +1,18 @@
 const express = require('express');
+const cors = require('cors');
 const dotenv = require('dotenv');
 const { loadData, findUserByName, addUser, updateUser, deleteUser, getAllUsers } = require('./database');
 const { cacheData, getCachedData } = require('./cache');
 
 dotenv.config();
 const app = express();
+app.use(cors()); // Agregar esta línea para habilitar CORS
 app.use(express.json());
 app.use(express.static('public'));
+
+app.use(cors({
+  origin: 'http://127.0.0.1:3000'
+}));
 
 // Cargar datos masivos
 app.post('/loadData', async (req, res) => {

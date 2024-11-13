@@ -2,6 +2,14 @@ const Redis = require('ioredis');
 const redis = new Redis({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
+  reconnectOnError: (err) => {
+    console.error('Error de conexión a Redis:', err);
+    return true; // Intentar reconectar
+  },
+  retryStrategy: (times) => {
+    // Esperar 2 segundos antes de reintentar
+    return Math.min(times * 1000, 10000);
+  }
 });
 
 const CACHE_SIZE = 5;
@@ -28,5 +36,11 @@ async function getCachedData(key) {
   }
   return null;
 }
+redis.on('connect', () => {
+  console.log('Conexión a Redis establecida');
+});
 
+redis.on('error', (err) => {
+  console.error('Error de conexión a Redis:', err);
+});
 module.exports = { cacheData, getCachedData };

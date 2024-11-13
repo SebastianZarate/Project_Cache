@@ -18,7 +18,7 @@ async function loadData() {
 }
 
 async function getAllUsers() {
-  const [rows] = await pool.query('SELECT * FROM users');
+  const [rows] = await pool.query('SELECT id_users AS id, name, age, email FROM users');
   return rows;
 }
 
@@ -36,7 +36,7 @@ async function updateUser(id, name, age, email) {
 }
 
 async function deleteUser(id) {
-  await pool.query('DELETE FROM users WHERE id = ?', [id]);
+  await pool.query('DELETE FROM users WHERE id_users = ?', [id]);
 }
 
 module.exports = { loadData, getAllUsers, findUserByName, addUser, updateUser, deleteUser };
