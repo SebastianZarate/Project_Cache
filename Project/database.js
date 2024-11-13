@@ -6,9 +6,6 @@ const pool = mysql.createPool({
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
 });
 
 async function loadData() {
@@ -17,9 +14,12 @@ async function loadData() {
     Math.floor(Math.random() * 50) + 18,
     `user${i}@example.com`
   ]);
+  await pool.query('INSERT INTO users (name, age, email) VALUES ?', [users]);
+}
 
-  const [rows] = await pool.query('INSERT INTO users (name, age, email) VALUES ?', [users]);
-  console.log(`Inserted ${rows.affectedRows} users`);
+async function getAllUsers() {
+  const [rows] = await pool.query('SELECT * FROM users');
+  return rows;
 }
 
 async function findUserByName(name) {
@@ -27,4 +27,16 @@ async function findUserByName(name) {
   return rows[0] || null;
 }
 
-module.exports = { loadData, findUserByName };
+async function addUser(name, age, email) {
+  await pool.query('INSERT INTO users (name, age, email) VALUES (?, ?, ?)', [name, age, email]);
+}
+
+async function updateUser(id, name, age, email) {
+  await pool.query('UPDATE users SET name = ?, age = ?, email = ? WHERE id = ?', [name, age, email, id]);
+}
+
+async function deleteUser(id) {
+  await pool.query('DELETE FROM users WHERE id = ?', [id]);
+}
+
+module.exports = { loadData, getAllUsers, findUserByName, addUser, updateUser, deleteUser };

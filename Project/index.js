@@ -1,46 +1,66 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const { loadData, findUserByName } = require('./database');
+const { loadData, findUserByName, addUser, updateUser, deleteUser, getAllUsers } = require('./database');
 const { cacheData, getCachedData } = require('./cache');
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 
-// Ruta para cargar datos masivos
+// Cargar datos masivos
 app.post('/loadData', async (req, res) => {
   try {
     await loadData();
-    res.send('Data loaded successfully');
+    res.send('Datos cargados exitosamente');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Failed to load data');
+    res.status(500).send('Error al cargar los datos');
   }
 });
 
-// Ruta para buscar por nombre
+// Obtener todos los usuarios
+app.get('/users', async (req, res) => {
+  const users = await getAllUsers();
+  res.json(users);
+});
+
+// Buscar usuario por nombre
 app.get('/user/:name', async (req, res) => {
   const { name } = req.params;
-
-  // Intentar obtener datos de la caché
   const cachedData = await getCachedData(name);
   if (cachedData) {
     return res.json({ source: 'cache', data: cachedData });
   }
-
-  // Buscar en la base de datos si no está en la caché
   const user = await findUserByName(name);
-  if (!user) {
-    return res.status(404).send('User not found');
-  }
-
-  // Almacenar en la caché
+  if (!user) return res.status(404).send('Usuario no encontrado');
   await cacheData(name, user);
   res.json({ source: 'database', data: user });
 });
 
-// Iniciar el servidor
+// Crear un nuevo usuario
+app.post('/user', async (req, res) => {
+  const { name, age, email } = req.body;
+  await addUser(name, age, email);
+  res.send('Usuario añadido');
+});
+
+// Actualizar un usuario
+app.put('/user/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, age, email } = req.body;
+  await updateUser(id, name, age, email);
+  res.send('Usuario actualizado');
+});
+
+// Eliminar un usuario
+app.delete('/user/:id', async (req, res) => {
+  const { id } = req.params;
+  await deleteUser(id);
+  res.send('Usuario eliminado');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

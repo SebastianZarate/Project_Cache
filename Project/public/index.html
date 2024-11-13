@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD con MySQL y Redis</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Gestión de Usuarios</h1>
+  <form id="userForm">
+    <input type="text" id="name" placeholder="Nombre" required>
+    <input type="number" id="age" placeholder="Edad" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <button type="submit">Añadir Usuario</button>
+  </form>
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Edad</th>
+        <th>Email</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script src="script.js"></script>
+</body>
+</html>
