@@ -39,4 +39,18 @@ async function deleteUser(id) {
   await pool.query('DELETE FROM users WHERE id_users = ?', [id]);
 }
 
-module.exports = { loadData, getAllUsers, findUserByName, addUser, updateUser, deleteUser };
+async function findUserById(id) {
+  const [rows] = await pool.query('SELECT * FROM users WHERE id_users = ?', [id]);
+  return rows[0] || null;
+}
+// database.js
+module.exports = { 
+  loadData, 
+  getAllUsers, 
+  findUserById, 
+  findUserByName, 
+  addUser, 
+  updateUser, 
+  deleteUser 
+};
+
